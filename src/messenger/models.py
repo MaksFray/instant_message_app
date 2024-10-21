@@ -1,6 +1,6 @@
 from sqlalchemy import Table, Column, Integer, TIMESTAMP, MetaData, ForeignKey, String
 
-metadata = MetaData()
+from database import metadata
 
 message = Table(
     "message",

@@ -4,9 +4,8 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import MetaData, Integer, TIMESTAMP, ForeignKey, Table, Column, String, JSON, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database import Base
+from database import Base, metadata
 
-metadata = MetaData()
 
 role = Table(
     "role",
