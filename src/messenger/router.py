@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.templating import Jinja2Templates
 
 from database import get_async_session
-from messenger.manager import ConnectionManager
+from messenger.manager import manager
 
 from messenger.models import Message
 from messenger.schemas import MessageCreate
@@ -46,14 +46,11 @@ async def add_message(new_message: MessageCreate, session: AsyncSession = Depend
     return {"status": "success"}
 
 
-manager = ConnectionManager()
-
-
-@router.get("/last_messages")
+@router.get("/chat/last_messages")
 async def get_last_messages(
         session: AsyncSession = Depends(get_async_session),
 ):
-    query = select(message).order_by(message.id.desc()).limit(5)
+    query = select(Message).order_by(Message.id.desc()).limit(5)
     messages = await session.execute(query)
     return messages.scalars().all()
 
@@ -61,7 +58,7 @@ async def get_last_messages(
 @router.websocket("/chat/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
     await manager.connect(websocket)
-    await manager.broadcast(f"Client #{client_id} connect the chat", add_to_db=False)
+    await manager.send_personal_message(f"Client #{client_id} connect the chat", websocket)
     try:
         while True:
             data = await websocket.receive_text()
