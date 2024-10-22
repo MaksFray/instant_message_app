@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi import Depends, Request
+from fastapi.openapi.models import Response
 from fastapi_users import BaseUserManager, IntegerIDMixin, schemas, exceptions, models
 
 from auth.models import User
@@ -25,6 +26,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
+
+    async def on_after_login(
+            self,
+            user: User,
+            request: Optional[Request] = None,
+            response: Optional[Response] = None,
+    ):
+        print(f"User {user.id} logged in.")
 
     async def create(
             self,
