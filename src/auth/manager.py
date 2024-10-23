@@ -15,7 +15,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     verification_token_secret = SECRET
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        print(f"User {user.id} has registered.")
+        print(f"User {user.id} {user.username}has registered.")
 
     async def on_after_forgot_password(
             self, user: User, token: str, request: Optional[Request] = None
@@ -33,7 +33,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             request: Optional[Request] = None,
             response: Optional[Response] = None,
     ):
-        print(f"User {user.id} logged in.")
+        print(f"User {user.username} logged in.")
 
     async def create(
             self,

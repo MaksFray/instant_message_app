@@ -3,7 +3,8 @@ from fastapi_users import schemas
 
 
 class UserRead(schemas.BaseUser[int]):
-    username: str
+    #username: str
+    pass
 
 
 class UserCreate(schemas.BaseUserCreate):
