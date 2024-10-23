@@ -10,3 +10,6 @@ class UserRead(schemas.BaseUser[int]):
 class UserCreate(schemas.BaseUserCreate):
     username: str
     role_id: int = 1
+
+class UserUpdate(schemas.BaseUserUpdate):
+    pass

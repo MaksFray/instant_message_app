@@ -18,6 +18,7 @@ from auth.manager import get_user_manager
 from auth.models import User
 from auth.schemas import UserRead, UserCreate
 
+from auth.users import router as router_users
 from messenger.router import router as router_messenger
 from tasks.router import router as router_tasks
 
@@ -48,10 +49,11 @@ current_user = fastapi_users.current_user()
 
 app.include_router(router_messenger)
 app.include_router(router_tasks)
-
+app.include_router(router_users)
 
 origins = [
     "http://localhost:5173",
+    "http://localhost:8000",
 ]
 
 app.add_middleware(
