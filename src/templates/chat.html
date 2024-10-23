@@ -15,7 +15,8 @@
     async function getLastMessages() {
         const url = 'http://localhost:8000/messages/chat/last_messages'
         const response = await fetch(url, {
-            method: 'GET'
+            method: 'GET',
+            headers: {'content-type': 'Access-Control-Allow-Origin'},
         })
         return response.json()
     }
@@ -24,7 +25,7 @@
         .then(messages => {
             appendMessage("Предыдущие 5 сообщений:")
             messages.forEach(msg => {
-                appendMessage(msg.message)
+                appendMessage(msg.content)
             })
             appendMessage("\nНовые сообщения:")
         })
