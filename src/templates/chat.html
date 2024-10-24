@@ -18,7 +18,8 @@
         const url = 'http://localhost:8000/messages/chat/last_messages'
         const response = await fetch(url, {
             method: 'GET',
-            headers: {'content-type': 'Access-Control-Allow-Origin'},
+            headers: {
+                      'Content-Type': 'multipart/form-data',},
         })
         return response.json()
     }
@@ -41,11 +42,8 @@
         messages.appendChild(message)
     }
     async function getCurrentUser() {
-        const response = await fetch(`http://localhost:8000/users/users/me`, {
+        const response = await fetch(`http://localhost:8000/users/me`, {
             method: 'GET',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-            },
         });
         if (!response.ok) {
         throw new Error(`Ошибка при получении данных пользователя: ${response.status}`);
