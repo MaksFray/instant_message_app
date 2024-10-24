@@ -2,6 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
+from contextlib import asynccontextmanager
+import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
@@ -19,6 +21,7 @@ from auth.models import User
 from auth.schemas import UserRead, UserCreate
 
 from auth.users import router as router_users
+from database import get_async_session
 from messenger.router import router as router_messenger
 from tasks.router import router as router_tasks
 
@@ -28,6 +31,14 @@ fastapi_users = FastAPIUsers[User, int](
 )
 
 app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup
+    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+    # shutdown
 
 #login
 #logout
@@ -65,10 +76,14 @@ app.add_middleware(
                    "Authorization"],
 )
 
-@app.on_event("startup")
-async def startup_event():
-    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+# @app.on_event("startup")
+# async def startup_event():
+#     redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+#     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
+
+
+
 @app.get("/protected-route")
 def protected_route(user: User = Depends(current_user)):
     return f"Hello, {user.username}"
@@ -76,3 +91,10 @@ def protected_route(user: User = Depends(current_user)):
 @app.get("/unprotected-route")
 def unprotected_route():
     return f"Hello, anonym"
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        port=8000,
+        reload=True,
+    )

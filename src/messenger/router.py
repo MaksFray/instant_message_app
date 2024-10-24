@@ -5,6 +5,8 @@ from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.templating import Jinja2Templates
 
+from auth.base_config import current_user
+from auth.models import User
 from database import get_async_session
 from messenger.manager import manager
 
@@ -55,14 +57,14 @@ async def get_last_messages(
     return messages.scalars().all()
 
 
-@router.websocket("/chat/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+@router.websocket("/chat/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
     await manager.connect(websocket)
-    await manager.send_personal_message(f"Client #{client_id} connect the chat", websocket)
+    await manager.send_personal_message(f"Client #{user_id} connect the chat", websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(f"Client #{client_id} says: {data}", add_to_db=True)
+            await manager.broadcast(f"Client #{user_id} says: {data}", add_to_db=True)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left the chat", add_to_db=False)
+        await manager.broadcast(f"Client #{user_id} left the chat", add_to_db=False)
